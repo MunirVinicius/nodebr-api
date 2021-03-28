@@ -1,5 +1,5 @@
 {
-  "name": "Node",
+  "name": "node",
   "version": "1.0.0",
   "description": "Projeto realizado durante as aulas da imersão em desenvolvimento de APIs com Node.js.",
   "main": "index.js",
