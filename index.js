@@ -36,43 +36,68 @@ function obterCep(idUsuario, callback){
 }
 
 const error = null || "" || false;
-
-const usuarioPromise = obterUsuario();
-
-usuarioPromise
-    .then(function (usuario){
-        return obterTelefone(usuario.id)
-            .then(function resolverTelefone(result){
-                return {
-                    usuario: {
-                        nome: usuario.nome,
-                        id: usuario.id,
-                    },
-                    telefone: result
-                }
-            })
-        })
-    .then(function (resultado){
-        const cep = obterCepAsync(resultado.usuario.id)
-        return cep
-            .then(function resolverCep(result){
-                return {
-                    usuario: resultado.usuario,
-                    telefone: resultado.telefone,
-                    cep: result
-                }
-            })
-    })
-    .then(function (resultado){
+main ()
+async function main(){
+    try{
+        console.time('medida-promise')
+        const usuario = await obterUsuario ()
+        // const telefone = await obterTelefone(usuario.id)
+        // const cep = await obterCepAsync(usuario.id)
+        const resultado = await Promise.all([
+            obterTelefone(usuario.id),
+            obterCepAsync(usuario.id)
+        ])
+        const cep = resultado[1] 
+        const telefone = resultado[0]
         console.log(`
-            Nome: ${resultado.usuario.nome}
-            Cep: ${resultado.cep.rua},${resultado.cep.number}
-            Telefone: (${resultado.telefone.ddd})${resultado.telefone.telefone}
+            Nome: ${usuario.nome},
+            Telefone:(${telefone.ddd}) ${telefone.telefone},
+            Cep: ${cep.rua}, ${cep.number}
+
         `)
-    })
-    .catch(function (error){
-        console.error('Deu erro ', error)
-    })
+        console.timeEnd('medida-promise')
+    }
+    catch(error){
+        console.error('Deu erro', error)
+    }
+}
+
+// const usuarioPromise = obterUsuario();
+
+// usuarioPromise
+//     .then(function (usuario){
+//         return obterTelefone(usuario.id)
+//             .then(function resolverTelefone(result){
+//                 return {
+//                     usuario: {
+//                         nome: usuario.nome,
+//                         id: usuario.id,
+//                     },
+//                     telefone: result
+//                 }
+//             })
+//         })
+//     .then(function (resultado){
+//         const cep = obterCepAsync(resultado.usuario.id)
+//         return cep
+//             .then(function resolverCep(result){
+//                 return {
+//                     usuario: resultado.usuario,
+//                     telefone: resultado.telefone,
+//                     cep: result
+//                 }
+//             })
+//     })
+//     .then(function (resultado){
+//         console.log(`
+//             Nome: ${resultado.usuario.nome}
+//             Cep: ${resultado.cep.rua},${resultado.cep.number}
+//             Telefone: (${resultado.telefone.ddd})${resultado.telefone.telefone}
+//         `)
+//     })
+//     .catch(function (error){
+//         console.error('Deu erro ', error)
+//     })
 
 // obterUsuario(function resolverUsuario(error,usuario){
 //     if(error){
